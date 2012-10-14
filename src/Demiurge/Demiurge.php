@@ -1,9 +1,63 @@
 <?php
 namespace Demiurge;
 
+/**
+ * The Demiurge class.
+ */
 class Demiurge
 {
     private $services = array();
+
+    /**
+     * Returns a function that simply returns $value
+     *
+     * @param mixed $value
+     * @return callable
+     */
+    public static function protect($value)
+    {
+        return function() use ($value) {
+            return $value;
+        };
+    }
+
+    /**
+     * Transform a callable into another one that execute the first anly the first time,
+     * and returns always the first return value.
+     *
+     * @param mixed $value
+     * @return callable
+     */
+    public static function share($value)
+    {
+        if (static::is_dynamic($value)) {
+            return function (Demiurge $d) use ($value) {
+                static $object;
+
+                if (null === $object) {
+                    $object = call_user_func($value, $d);
+                }
+
+                return $object;
+            };
+        }
+
+        return $value;
+    }
+
+    /**
+     * Tells if the $value is what Demiurge consider a callable.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private static function is_dynamic($value)
+    {
+        if (is_object($value) && method_exists($value, '__invoke'))
+            return true;
+
+        return false;
+    }
 
     /**
      * Set a value or a service.
@@ -16,8 +70,8 @@ class Demiurge
      */
     public function __set($name, $value)
     {
-        if (!$this->isDynamic($value)) {
-            $value = function() use ($value) { return $value; };
+        if (!$this->is_dynamic($value)) {
+            $value = $this->protect($value);
         }
 
         $this->services[$name] = $value;
@@ -35,6 +89,14 @@ class Demiurge
         return $this->__call($name);
     }
 
+    /**
+     * Get a value with method access
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     * @throws \OutOfBoundsException
+     */
     public function __call($name, $arguments = array())
     {
         if (!isset($this->services[$name]))
@@ -43,19 +105,5 @@ class Demiurge
         array_unshift($arguments, $this);
 
         return call_user_func_array($this->services[$name], $arguments);
-    }
-
-    /**
-     * Tells if the $value is what Demiurge consider a callable.
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    private function isDynamic($value)
-    {
-        if (is_object($value) && method_exists($value, '__invoke'))
-            return true;
-
-        return false;
     }
 }

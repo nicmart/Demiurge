@@ -73,4 +73,26 @@ class DemiurgeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('returnValue', $this->demiurge->serviceAsMethod($v1, $v2));
     }
 
+    public function testProtect()
+    {
+        $f = $this->demiurge->protect('ciao');
+
+        $this->assertEquals('ciao', $f());
+    }
+
+    public function testShare()
+    {
+        $f = function (Demiurge $d) {
+            static $var = 0;
+            ++$var;
+
+            return $var;
+        };
+
+        $shared = $this->demiurge->share($f);
+
+        $this->assertEquals(1, $shared($this->demiurge));
+        $this->assertEquals(1, $shared($this->demiurge));
+    }
+
 }
