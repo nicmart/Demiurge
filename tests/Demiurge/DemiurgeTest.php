@@ -37,6 +37,16 @@ class DemiurgeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('a', $this->demiurge->constant);
     }
 
+    public function testMethodCalledAsProperty()
+    {
+        $d = new DemiurgeMock();
+        $nicValue = $d->nic();
+        $gabValue = $d->getGab();
+
+        $this->assertEquals($nicValue, $d->nic, 'Access a method result as a property');
+        $this->assertEquals($gabValue, $d->gab, 'Access a method result as a property, where the method has getter syntax');
+    }
+
     /**
      * @expectedException OutOfBoundsException
      */
@@ -95,4 +105,17 @@ class DemiurgeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $shared($this->demiurge));
     }
 
+}
+
+class DemiurgeMock extends Demiurge
+{
+    public function nic()
+    {
+        return 'nic';
+    }
+
+    public function getGab()
+    {
+        return 'gab';
+    }
 }

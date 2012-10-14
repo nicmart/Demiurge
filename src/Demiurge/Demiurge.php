@@ -86,6 +86,12 @@ class Demiurge
      */
     public function __get($name)
     {
+        if (method_exists($this, $name)) {
+            return $this->$name();
+        } elseif (method_exists($this, $methodName = 'get' . ucfirst($name))) {
+            return $this->$methodName();
+        }
+
         return $this->__call($name);
     }
 
