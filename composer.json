@@ -1,0 +1,22 @@
+{
+    "name": "nicmart/demiurge",
+    "type": "library",
+    "description": "Demiurge is a library that builds data for you",
+    "keywords": ["faker", "fixtures", "data"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolò Martini",
+            "email": ""
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "Demiurge": "src/",
+            "Demiurge\\Test": "tests"
+        }
+    }
+}
