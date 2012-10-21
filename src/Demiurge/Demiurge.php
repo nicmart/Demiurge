@@ -65,8 +65,8 @@ class Demiurge
      * when the value will be retrivied the callback will be executed.
      * Otherwise it will returned the plain value.
      *
-     * @param string $name
-     * @param mixed $value
+     * @param string $name      The name of the service
+     * @param mixed $value      The value or closure that will generate the service
      */
     public function __set($name, $value)
     {
@@ -86,42 +86,61 @@ class Demiurge
      */
     public function __get($name)
     {
-        if (method_exists($this, $name)) {
-            return $this->$name();
-        } elseif (method_exists($this, $methodName = 'get' . ucfirst($name))) {
-            return $this->$methodName();
-        }
-
-        return $this->__call($name);
+        return call_user_func_array($this->getRawService($name), array($this));
     }
 
     /**
      * Get a value with method access
      *
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
+     * @param string $name              The name of the service
+     * @param array $arguments          The arguments to pass to the service definition
+     * @return mixed                    The service
      * @throws \OutOfBoundsException
      */
     public function __call($name, $arguments = array())
     {
-        if (!$this->hasService($name))
-            throw new \OutOfBoundsException(sprintf('Service $s is not defined', $name));
-
         array_unshift($arguments, $this);
 
-        return call_user_func_array($this->services[$name], $arguments);
+        return call_user_func_array($this->getRawService($name), $arguments);
     }
 
     /**
      * Check if the service exists.
      *
-     * @param string $name
-     * @return bool
+     * @param string $name  The name of the service
+     * @return bool         True if the service is defined in the container, false otherwise
      */
     public function hasService($name)
     {
-        return method_exists($this, $name) || (method_exists($this, $methodName = 'get' . ucfirst($name)))
-            || isset($this->services[$name]);
+        try {
+            $this->getRawService($name);
+        } catch (\OutOfBoundsException $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns the the callable that will returns the service
+     *
+     * @param string $name                     The name of the service
+     * @return Callable                 The callable that will generate the service
+     * @throws \OutOfBoundsException    Thrown if the service is not defined
+     */
+    public function getRawService($name)
+    {
+        if (isset($this->services[$name]))
+            return $this->services[$name];
+
+        if (method_exists($this, $name)) {
+            return array($this, $name);
+        }
+
+        if (method_exists($this, $methodName = 'get' . ucfirst($name))) {
+            return array($this, $methodName);
+        }
+
+        throw new \OutOfBoundsException(sprintf("Service '$name' is not defined", $name));
     }
 }

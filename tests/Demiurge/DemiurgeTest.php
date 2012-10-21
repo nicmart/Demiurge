@@ -117,7 +117,29 @@ class DemiurgeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($d->hasService('nic'), 'HasService: method service');
         $this->assertTrue($d->hasService('gab'), 'HasService: getter service');
 
-        $this->assertFalse($d->hasService('xxx'), 'HasService: inexistend service');
+        $this->assertFalse($d->hasService('xxx'), 'HasService: inexistent service');
+    }
+
+    public function testGetRawService()
+    {
+        $d = new DemiurgeMock();
+        $d->var = 'var';
+
+        $service = $d->getRawService('var');
+
+        $this->assertInstanceOf('Closure', $service, 'Plain vars are closures that returns the var value');
+        $this->assertEquals('var', $service(), 'Plain vars are closures that returns the var value');
+
+        $service = $d->getRawService('gab');
+        $this->assertEquals(array($d, 'getGab'), $service, 'Instance getters become the correnspondent array callable');
+    }
+
+    /**
+     * @expectedException OutOfBoundsException
+     */
+    public function testGetRawServiceWhenServiceIsNotDefined()
+    {
+        $this->demiurge->ciao;
     }
 
 /*    public function testMerge()
