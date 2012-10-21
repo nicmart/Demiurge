@@ -12,8 +12,8 @@ class Demiurge
     /**
      * Returns a function that simply returns $value
      *
-     * @param mixed $value
-     * @return callable
+     * @param mixed $value  The value to protect
+     * @return callable     A closure that returns $value
      */
     public static function protect($value)
     {
@@ -26,8 +26,8 @@ class Demiurge
      * Transform a callable into another one that execute the first anly the first time,
      * and returns always the first return value.
      *
-     * @param mixed $value
-     * @return callable
+     * @param mixed $value  The value or service to wrap
+     * @return callable     A callable that will return $value;
      */
     public static function share($value)
     {
@@ -49,8 +49,8 @@ class Demiurge
     /**
      * Tells if the $value is what Demiurge consider a callable.
      *
-     * @param mixed $value
-     * @return bool
+     * @param mixed $value  The value to check
+     * @return bool         True if it is considered dynamic, false otherwise
      */
     private static function is_dynamic($value)
     {
@@ -152,7 +152,6 @@ class Demiurge
 
             return $service;
         }
-
 
         throw new \OutOfBoundsException(sprintf("Service '$name' is not defined", $name));
     }
