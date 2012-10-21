@@ -105,6 +105,39 @@ class DemiurgeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $shared($this->demiurge));
     }
 
+    public function testHasService()
+    {
+        $d = new DemiurgeMock();
+
+        $d->var = 'var';
+        $d->service = function() { return ''; };
+
+        $this->assertTrue($d->hasService('var'), 'HasService: Plain variable service');
+        $this->assertTrue($d->hasService('service'), 'HasService: closure service');
+        $this->assertTrue($d->hasService('nic'), 'HasService: method service');
+        $this->assertTrue($d->hasService('gab'), 'HasService: getter service');
+
+        $this->assertFalse($d->hasService('xxx'), 'HasService: inexistend service');
+    }
+
+/*    public function testMerge()
+    {
+        $d1 = new DemiurgeMock;
+        $d2 = new Demiurge;
+
+        $d1->service = function() { return 'service'; };
+        $d1->serviceWithArgs = function(Demiurge $d, $arg1) { return $arg1; };
+        $d1->var1 = 'var1';
+
+        $d2->merge($d1);
+
+        $this->assertEquals('service', $d2->service, 'Merged service, property access');
+        $this->assertEquals('xyz', $d2->serviceWithArgs('xyz'), 'Merged service, method access');
+        $this->assertEquals('var1', $d2->var1, 'Merged service, plain variable');
+        $this->assertEquals('nic', $d2->nic, 'Merged service, instance method');
+        $this->assertEquals('gab', $d2->gab, 'Merged service, instance getter');
+    }*/
+
 }
 
 class DemiurgeMock extends Demiurge

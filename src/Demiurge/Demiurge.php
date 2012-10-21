@@ -105,11 +105,23 @@ class Demiurge
      */
     public function __call($name, $arguments = array())
     {
-        if (!isset($this->services[$name]))
+        if (!$this->hasService($name))
             throw new \OutOfBoundsException(sprintf('Service $s is not defined', $name));
 
         array_unshift($arguments, $this);
 
         return call_user_func_array($this->services[$name], $arguments);
+    }
+
+    /**
+     * Check if the service exists.
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function hasService($name)
+    {
+        return method_exists($this, $name) || (method_exists($this, $methodName = 'get' . ucfirst($name)))
+            || isset($this->services[$name]);
     }
 }
