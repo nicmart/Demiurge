@@ -142,7 +142,7 @@ class DemiurgeTest extends \PHPUnit_Framework_TestCase
         $this->demiurge->ciao;
     }
 
-/*    public function testMerge()
+    public function testMerge()
     {
         $d1 = new DemiurgeMock;
         $d2 = new Demiurge;
@@ -158,7 +158,7 @@ class DemiurgeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('var1', $d2->var1, 'Merged service, plain variable');
         $this->assertEquals('nic', $d2->nic, 'Merged service, instance method');
         $this->assertEquals('gab', $d2->gab, 'Merged service, instance getter');
-    }*/
+    }
 
 }
 

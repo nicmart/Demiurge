@@ -7,6 +7,7 @@ namespace Demiurge;
 class Demiurge
 {
     private $services = array();
+    private $mergedContainers = array();
 
     /**
      * Returns a function that simply returns $value
@@ -124,7 +125,7 @@ class Demiurge
     /**
      * Returns the the callable that will returns the service
      *
-     * @param string $name                     The name of the service
+     * @param string $name              The name of the service
      * @return Callable                 The callable that will generate the service
      * @throws \OutOfBoundsException    Thrown if the service is not defined
      */
@@ -141,6 +142,32 @@ class Demiurge
             return array($this, $methodName);
         }
 
+        /** @var $demiurge Demiurge */
+        foreach ($this->mergedContainers as $demiurge) {
+            try {
+                $service = $demiurge->getRawService($name);
+            } catch (\OutOfBoundsException $e) {
+                continue;
+            }
+
+            return $service;
+        }
+
+
         throw new \OutOfBoundsException(sprintf("Service '$name' is not defined", $name));
+    }
+
+    /**
+     * Merge another Demiurge container into this one. When another container is merged, its services
+     * can be retrieved as if they were of this container.
+     *
+     * @param Demiurge $demiurge    The Demiurge object to merge
+     * @return Demiurge             The current instance
+     */
+    public function merge(Demiurge $demiurge)
+    {
+        $this->mergedContainers[] = $demiurge;
+
+        return $this;
     }
 }
